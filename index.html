@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>بطاقة إلكترونية - Lahcen Oxigene</title>
+  <meta name="description" content="Professional business card with quick actions and social links." />
+  <!-- QR Code Library -->
+  <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
+  <style>
+    :root{
+      --bg:#0b0f17; --card:#111827; --muted:#94a3b8; --text:#e5e7eb;
+      --accent1:#22c55e; --accent2:#38bdf8; --ring: rgba(34,197,94,.45); --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; background: radial-gradient(1200px 700px at 10% 10%, rgba(34,197,94,.15), transparent 60%),
+                          radial-gradient(900px 600px at 90% 90%, rgba(56,189,248,.12), transparent 60%), var(--bg);
+         color:var(--text); font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+         display:grid; place-items:center; padding:24px;}
+    .card{width:min(780px, 96vw); background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)), var(--card);
+          border-radius: var(--radius); position:relative; overflow:hidden; box-shadow: 0 10px 40px rgba(0,0,0,.45);
+          border:1px solid rgba(148,163,184,.15)}
+    .glow{position:absolute; inset:-1px; pointer-events:none; filter: blur(28px); opacity:.7}
+    .glow::before{content:""; position:absolute; inset:0; background: conic-gradient(from 180deg at 50% 50%, var(--accent1), transparent 25%, var(--accent2), transparent 50%, var(--accent1)); mask: radial-gradient(farthest-side, #0000 calc(100% - 4px), #000 0)}
+
+    header{display:flex; gap:18px; align-items:center; padding:28px 28px 10px 28px; justify-content: space-between;}
+    .brandbox{display:grid; place-items:center}
+    .logo{width:78px; height:78px; object-fit:cover; border-radius:14px; background:rgba(255,255,255,.04); border:1px solid rgba(148,163,184,.18); box-shadow:0 4px 18px rgba(2,6,23,.35)}
+    .avatar{display:block; width:78px; height:78px; object-fit:cover; border-radius:50%; background:rgba(255,255,255,.04); border:1px solid rgba(148,163,184,.18); box-shadow:0 4px 18px rgba(2,6,23,.35)}
+    .titles{flex:1; text-align: center;}
+    .titles h1{margin:0; font-size: clamp(20px, 3.2vw, 30px); letter-spacing:.2px}
+    .titles p{margin:6px 0 0; color:var(--muted)}
+
+    .chips{display:flex; flex-wrap:wrap; gap:10px; padding:0 28px 16px 28px}
+    .chip{padding:8px 12px; border-radius:999px; background: rgba(148,163,184,.12); color:#cbd5e1; border:1px solid rgba(148,163,184,.18)}
+
+    .actions{display:grid; grid-template-columns: repeat(2, 1fr); gap:12px; padding: 18px 18px 8px 18px}
+    /* Changed to 4 columns on desktop for an 8-button grid */
+    @media (min-width:680px){ .actions{ grid-template-columns: repeat(4, 1fr)} } 
+
+    .btn{display:flex; align-items:center; justify-content:center; gap:10px; padding:14px 14px; border-radius:16px; background:#0f172a; border:1px solid rgba(148,163,184,.18); color:var(--text); text-decoration:none; font-weight:600; box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 8px 18px rgba(2,6,23,.35); transition: transform .1s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease}
+    .btn:hover{ transform: translateY(-1px); border-color: rgba(34,197,94,.45); box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 16px 28px rgba(2,6,23,.5); background: linear-gradient(180deg, rgba(34,197,94,.08), rgba(2,6,23,.8))}
+    .btn svg{width:20px; height:20px; opacity:.95; fill: currentColor;}
+    .btn span { line-height: 1; } /* Ensure text aligns with icon */
+
+    .cta{ padding: 8px 18px 22px 18px; display:flex; gap:12px; flex-wrap:wrap}
+    .cta .btn.primary{ 
+      flex:1 1 220px; 
+      background: linear-gradient(135deg, rgba(34,197,94,.18), rgba(56,189,248,.18)); 
+      border-color: rgba(34,197,94,.35);
+      /* Add pulse animation */
+      animation: pulse 2.5s infinite;
+    }
+
+    /* Pulse Keyframes */
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+      }
+      50% {
+        transform: scale(1.03);
+        box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+      }
+    }
+
+    footer{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:16px 22px 22px 22px; color:var(--muted); font-size:13px}
+    .credit{display:none; text-align:center; font-size:13px; color:var(--muted)}
+    .about-toggle{position:absolute; bottom:16px; left:18px; width:28px; height:28px; border-radius:50%; background:rgba(148,163,184,.2); border:1px solid rgba(148,163,184,.35); color:var(--text); font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center}
+    .about-toggle:hover{background:rgba(34,197,94,.25)}
+    .credit.visible{display:block; position:absolute; bottom:56px; left:18px; background:var(--card); border-radius:12px; padding:12px 16px; box-shadow:0 8px 20px rgba(0,0,0,.5); max-width:320px}
+  
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.7);
+      display: grid; place-items: center; padding: 20px;
+      opacity: 0; visibility: hidden; z-index: 1000;
+      transition: opacity .3s ease, visibility .3s ease;
+    }
+    .modal-overlay.visible { opacity: 1; visibility: visible; }
+    .modal-content {
+      background: var(--card); border-radius: var(--radius); padding: 30px;
+      width: min(350px, 90vw); text-align: center;
+      border: 1px solid rgba(148,163,184,.15);
+      position: relative; transform: scale(0.9);
+      transition: transform .3s ease;
+    }
+    .modal-overlay.visible .modal-content { transform: scale(1); }
+    .modal-close {
+      position: absolute; top: 10px; left: 15px; /* RTL friendly */
+      background: none; border: none; font-size: 28px;
+      color: var(--muted); cursor: pointer; padding: 0; line-height: 1;
+    }
+    #qrcode { margin: 20px auto; width: 220px; height: 220px; background: white; padding: 10px; border-radius: 10px; }
+    #qrcode canvas { width: 100% !important; height: 100% !important; }
+    #qrcode img { width: 100% !important; height: 100% !important; }
+    #shareLinkInput {
+      width: 100%; padding: 10px; border-radius: 8px; background: #0f172a;
+      border: 1px solid rgba(148,163,184,.18); color: var(--text);
+      text-align: center; margin-bottom: 15px; direction: ltr; /* URLs are LTR */
+    }
+    #copyLinkBtn { width: 100%; }
+  </style>
+</head>
+<body>
+  <main class="card" role="main">
+    <div class="glow"></div>
+
+    <header>
+      <div class="brandbox">
+        <!-- شعار العمل (logo.png) - سيظهر على اليسار -->
+        <img id="logoImg" src="logo.png" alt="شعار" class="logo" />
+      </div>
+      <div class="titles">
+        <h1 id="brand">Lahcen Oxigene</h1>
+        <p id="tag">Nizar Travel- Lahcen Oxigeneسياحة وسفر</p>
+      </div>
+      <div class="brandbox">
+        <!-- الصورة الشخصية (avatar.png) - ستظهر على اليمين -->
+        <img id="avatarImg" src="avatar.png" alt="صورة شخصية" class="avatar" />
+      </div>
+    </header>
+
+    <section class="chips">
+      <span class="chip" id="phoneChip" dir="ltr">0551 51 01 64</span>
+      <span class="chip">WhatsApp ready</span>
+      <span class="chip">باب الزوار • الجزائر</span>
+    </section>
+
+    <div class="divider"></div>
+
+    <section class="actions">
+      <!-- Button 1: Call -->
+      <a class="btn" id="callBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M18.33 14.09v2.5a1.67 1.67 0 0 1-1.82 1.67A16.49 16.49 0 0 1 9.25 15.5a16.25 16.25 0 0 1-5-5A16.49 16.49 0 0 1 1.5 3.24 1.67 1.67 0 0 1 3.17 1.5h2.5a1.67 1.67 0 0 1 1.67 1.43A10.7 10.7 0 0 0 8 5.74a1.67 1.67 0 0 1-.37 1.76l-1.06 1.06a13.33 13.33 0 0 0 5 5l1.06-1.06a1.67 1.67 0 0 1 1.76-.37 10.7 10.7 0 0 0 2.81.58A1.67 1.67 0 0 1 18.33 14.09z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
+        <span>اتصال</span>
+      </a>
+      <!-- Button 2: WhatsApp -->
+      <a class="btn" id="waBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M16.7,3.31A9.89,9.89,0,0,0,10,1.5,9.89,9.89,0,0,0,1.5,10a9.89,9.89,0,0,0,3.31,6.7L3.3,18.5,5.1,17A9.89,9.89,0,0,0,10,18.5h0a9.89,9.89,0,0,0,9.89-9.89A9.89,9.89,0,0,0,16.7,3.31ZM10,17.08a8.47,8.47,0,0,1-4.32-1.22l-.31-.18-3.21.84.86-3.13-.2-.32A8.47,8.47,0,1,1,10,17.08ZM14.4,12.a5.07,5.07,0,0,0-2.79-2.79A3.3,3.3,0,0,0,8.3,8.3,3.3,3.3,0,0,0,7.38,9.75,4.7,4.7,0,0,0,7.1,11a7.48,7.48,0,0,0,3,3A4.7,4.7,0,0,0,11.2,14.4a3.3,3.3,0,0,0,1.45-1,3.3,3.3,0,0,0,.92-3.32Z"></path></svg>
+        <span>واتساب</span>
+      </a>
+      <!-- Button 3: Facebook -->
+      <a class="btn" id="fbBtn" href="https://www.facebook.com/share/19hhyUyRbF/" target="_blank">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13.41,18.5H11.23a1.32,1.32,0,0,1-1.32-1.32V12.06h4.15l.62-4.15H9.91V5c0-1.12.51-1.63,1.75-1.63h2.6V.21c-1-.15-2-.21-3.07-.21C8.69,0,6.59,1.63,6.59,4.6v3.31H3.41v4.15H6.59v5.12A1.32,1.32,0,0,1,5.27,18.5H3.09a.5.5,0,0,1-.5-.5V2a.5.5,0,0,1,.5-.5H16.41a.5.5,0,0,1,.5.5V18A.5.5,0,0,1,16.41,18.5Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
+        <span>فيسبوك</span>
+      </a>
+      <!-- Button 4: TikTok -->
+      <a class="btn" id="tiktokBtn" href="https://www.tiktok.com/@lahcen.loxigen?_t=ZS-90l7ItnPm3m&_r=1" target="_blank">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13.79,3.66a5,5,0,0,1,4.64,6.86h0A5.25,5.25,0,0,1,13.6,15V1.5H10.13V12.1A3.2,3.2,0,0,1,4.5,11.45v3.1A6.74,6.74,0,0,0,10.13,15V18.5h3.66V15a5.2,5.2,0,0,1,4.64-5.12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
+        <span>تيك توك</span>
+      </a>
+      <!-- Button 5: Location -->
+      <a class="btn" id="gpsBtn" href="https://maps.app.goo.gl/zsMUHLmu33Tch7wy5" target="_blank">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M10,10.5a3,3,0,1,1,3-3A3,3,0,0,1,10,10.5Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path><path d="M10,1.5A7,7,0,0,1,17,8.5c0,5.25-7,10-7,10S3,13.75,3,8.5A7,7,0,0,1,10,1.5Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
+        <span>الموقع</span>
+      </a>
+      <!-- Button 6: Save Contact (vCard) -->
+      <a class="btn" id="saveVcfBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M14.17 10.83a4.17 4.17 0 1 0-8.34 0 4.17 4.17 0 0 0 8.34 0zM17.5 17.5v-1.67a3.33 3.33 0 0 0-3.33-3.33H5.83a3.33 3.33 0 0 0-3.33 3.33V17.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path><line x1="17.5" y1="5.83" x2="17.5" y2="1.67" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></line><line x1="15.42" y1="3.75" x2="19.58" y2="3.75" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></line></svg>
+        <span>حفظ</span>
+      </a>
+      <!-- Button 7: Share -->
+      <a class="btn" id="shareBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M17.5,12.5a2.49,2.49,0,0,1-1.76-4.26L8.24,5.74A2.5,2.5,0,1,1,7.5,4.26L15,6.76a.5.5,0,0,0,.5-.5V5.5A2.5,2.5,0,1,1,17.5,8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path><path d="M15.74,14.26l-7.5,2.5a2.5,2.5,0,1,1-.74-1.52l7.5-2.5a.5.5,0,0,0,.5-.5v-.5a2.5,2.5,0,1,1,2,2.26Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
+        <span>مشاركة</span>
+      </a>
+      <!-- Button 8: QR Code (REMOVED) -->
+    </section>
+
+    <section class="cta">
+      <a class="btn primary" id="bookBtn" href="https://wa.me/213551510164?text=Hello%2C%20I%27d%20like%20to%20book." target="_blank">🗓️ حجز سريع على واتساب</a>
+    </section>
+
+    <footer>
+      <div>© <span id="year"></span> <span id="brandFoot">Lahcen Oxigene</span></div>
+    </footer>
+
+    <button class="about-toggle" id="aboutBtn">i</button>
+    <div class="credit" id="creditBox">مصمّم بواسطة <strong>الأستاذ صلاح الدين بن لخضر</strong> — مركز <strong>TS‑GSM TECHNOLOGIE DZ PRO</strong> • باب الزوار، الجزائر</div>
+  
+    <!-- QR Code Modal -->
+    <div id="qrModal" class="modal-overlay">
+      <div class="modal-content">
+        <button id="closeQrBtn" class="modal-close">&times;</button>
+        <h2>شارك هذه البطاقة</h2>
+        <p>امسح الرمز أو انسخ الرابط</p>
+        <!-- QR Code will be generated here -->
+        <div id="qrcode"></div>
+        <input type="text" id="shareLinkInput" readonly>
+        <button id="copyLinkBtn" class="btn">نسخ الرابط</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const BRAND   = 'Lahcen Oxigene';
+    const TAGLINE = 'Nizar Travel- Lahcen Oxigeneسياحة وسفر';
+    const PHONE_E164 = '+213551510164';
+    const PHONE_DISPLAY = '0551 51 01 64';
+    const WA_INTL    = '213551510164';
+
+    // dynamic text
+    document.getElementById('brand').textContent = BRAND;
+    document.getElementById('brandFoot').textContent = BRAND;
+    document.getElementById('tag').textContent = TAGLINE;
+    document.getElementById('phoneChip').textContent = PHONE_DISPLAY;
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // links
+    const callBtn = document.getElementById('callBtn');
+    const waBtn   = document.getElementById('waBtn');
+    if (callBtn) callBtn.href = 'tel:' + PHONE_E164;
+    if (waBtn)  waBtn.href = 'https://wa.me/' + WA_INTL;
+
+    // about toggle
+    const aboutBtn  = document.getElementById('aboutBtn');
+    const creditBox = document.getElementById('creditBox');
+    if (aboutBtn && creditBox){ aboutBtn.addEventListener('click',()=> creditBox.classList.toggle('visible')); }
+    
+    // logo error handlers
+    const logoImg = document.getElementById('logoImg');
+    logoImg.onerror = function() {
+        this.style.display = 'none';
+    };
+    const avatarImg = document.getElementById('avatarImg');
+    avatarImg.onerror = function() {
+        this.style.display = 'none';
+    };
+
+    // --- vCard (Save Contact) ---
+    const vCardData = `BEGIN:VCARD
+VERSION:3.0
+FN:${BRAND}
+ORG:Nizar Travel
+TITLE:سياحة وسفر
+TEL;TYPE=WORK,VOICE:${PHONE_E164}
+TEL;TYPE=CELL,VOICE:${PHONE_E164}
+ADR;TYPE=WORK:;;باب الزوار;الجزائر;;;
+URL;TYPE=Facebook:https://www.facebook.com/share/19hhyUyRbF/
+URL;TYPE=TikTok:https://www.tiktok.com/@lahcen.loxigen?_t=ZS-90l7ItnPm3m&_r=1
+URL;TYPE=Location:https://maps.app.goo.gl/zsMUHLmu33Tch7wy5
+END:VCARD`;
+
+    const saveVcfBtn = document.getElementById('saveVcfBtn');
+    saveVcfBtn.addEventListener('click', () => {
+        const blob = new Blob([vCardData], { type: 'text/vcard;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${BRAND}.vcf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+
+    // --- QR Code Modal & Share ---
+    const qrModal = document.getElementById('qrModal');
+    const closeQrBtn = document.getElementById('closeQrBtn');
+    const qrcodeEl = document.getElementById('qrcode');
+    const shareLinkInput = document.getElementById('shareLinkInput');
+    const copyLinkBtn = document.getElementById('copyLinkBtn');
+    const pageUrl = window.location.href;
+    let qrCodeInstance = null;
+
+    function showQrModal() {
+        shareLinkInput.value = pageUrl;
+        if (!qrCodeInstance && typeof QRCode !== 'undefined') {
+            qrCodeInstance = new QRCode(qrcodeEl, {
+                text: pageUrl,
+                width: 200,
+                height: 200,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        } else if (qrCodeInstance) {
+            qrCodeInstance.makeCode(pageUrl);
+        }
+        qrModal.classList.add('visible');
+    }
+
+    function hideQrModal() {
+        qrModal.classList.remove('visible');
+    }
+
+    closeQrBtn.addEventListener('click', hideQrModal);
+    qrModal.addEventListener('click', (e) => {
+        if (e.target === qrModal) hideQrModal(); // Close on overlay click
+    });
+
+    copyLinkBtn.addEventListener('click', () => {
+        shareLinkInput.select();
+        try {
+            // Use execCommand for broader compatibility in iFrames
+            document.execCommand('copy'); 
+            copyLinkBtn.textContent = 'تم النسخ!';
+            setTimeout(() => { copyLinkBtn.textContent = 'نسخ الرابط'; }, 2000);
+        } catch (err) {
+            console.error('Failed to copy text: ', err);
+            copyLinkBtn.textContent = 'فشل النسخ';
+        }
+    });
+
+    // --- Web Share API ---
+    const shareBtn = document.getElementById('shareBtn');
+    shareBtn.addEventListener('click', async () => {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: `بطاقة إلكترونية - ${BRAND}`,
+                    text: `تفضل بطاقة ${BRAND} الإلكترونية`,
+                    url: pageUrl
+                });
+            } catch (error) {
+                console.error('Error sharing:', error);
+            }
+        } else {
+            // Fallback for desktop or unsupported browsers
+            showQrModal();
+        }
+    });
+
+  </script>
+</body>
+</html>
+
+
+
